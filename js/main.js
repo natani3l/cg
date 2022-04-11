@@ -15,11 +15,7 @@ let mouseBefore = {
 const keys = {
   'W': false,
   'S': false,
-  'A': false,
-  'D': false,
-  'SPACE': false,
-  'IDLE': false,
-  'SHF': false,
+  'F': false,
 }
 
 let activeAction
@@ -29,8 +25,6 @@ let mixer;
 scene = new THREE.Scene();
 
 const setAction = (toAction) => {
-  console.log("to actio", toAction)
-  console.log("activeAction", activeAction)
   if (toAction != activeAction) {
     lastAction = activeAction
 
@@ -38,9 +32,9 @@ const setAction = (toAction) => {
     activeAction.reset()
 
     lastAction.stop()
-    // lastAction.fadeOut(1)
+    lastAction.fadeOut(1)
 
-    // activeAction.fadeIn(1)
+    activeAction.fadeIn(1)
     activeAction.play()
   }
 }
@@ -55,21 +49,15 @@ const animations = {
   forward: () => {
     setAction(animationActions[2])
   },
-  // forwardStop: () => {
-  //   setAction(animationActions[3])
-  // },
-  // left: () => {
-  //   setAction(animationActions[4])
-  // },
-  // right: () => {
-  //   setAction(animationActions[5])
-  // },
-  // runForward: () => {
-  //   setAction(animationActions[6])
-  // },
-  // space: () => {
-  //   setAction(animationActions[7])
-  // }
+  forwardStop: () => {
+    setAction(animationActions[3])
+  },
+  dancing: () => {
+    setAction(animationActions[4])
+  },
+  hiphopdancing: () => {
+    setAction(animationActions[5])
+  }
 
 }
 
@@ -110,23 +98,6 @@ function loadObjects() {
   const animationsFolder = gui.addFolder('Animações');
   animationsFolder.open()
 
-  // GLTFLoader().load('models/Soldier.glb', function (gltf) {
-  //   const model = gltf.scene;
-  //   model.traverse(function (object) {
-  //     if (object.isMesh) object.castShadow = true;
-  //   });
-  //   scene.add(model);
-
-  //   const gltfAnimations = gltf.animations;
-  //   mixer = new THREE.AnimationMixer(model);
-
-  //   gltfAnimations.filter(a => a.name != 'TPose').forEach((a) => {
-  //     animationsMap.set(a.name, mixer.clipAction(a))
-  //   })
-
-  //   // characterControls = new CharacterControls(model, mixer, animationsMap, orbitControls, camera, 'Idle')
-  // });
-
   fbxLoader.load('assets/archer/archer.fbx',
     (object) => {
       mixer = new THREE.AnimationMixer(object);
@@ -153,50 +124,36 @@ function loadObjects() {
               const animationAction = mixer.clipAction(object.animations[0]);
               animationActions.push(animationAction);
               animationsFolder.add(animations, 'forward')
-              console.log("animationActions ", animationActions)
 
-              // fbxLoader.load(
-              //   'assets/archer/forward-stop.fbx',
-              //   (object) => {
-              //     console.log("Loaded forward-stop");
-              //     const animationAction = mixer.clipAction(object.animations[0]);
-              //     animationActions.push(animationAction);
-              //     animationsFolder.add(animations, 'forwardStop');
+              fbxLoader.load(
+                'assets/archer/forward-stop.fbx',
+                (object) => {
+                  console.log("Loaded forward-stop");
+                  const animationAction = mixer.clipAction(object.animations[0]);
+                  animationActions.push(animationAction);
+                  animationsFolder.add(animations, 'forwardStop');
+                  
+                  fbxLoader.load(
+                    'assets/archer/dancing.fbx',
+                    (object) => {
+                      console.log("Loaded dancing");
+                      const animationAction = mixer.clipAction(object.animations[0]);
+                      animationActions.push(animationAction);
+                      animationsFolder.add(animations, 'dancing');
 
-              //     fbxLoader.load(
-              //       'assets/archer/right.fbx',
-              //       (object) => {
-              //         console.log("Loaded walk right");
-              //         const animationAction = mixer.clipAction(object.animations[0]);
-              //         animationActions.push(animationAction);
-              //         animationsFolder.add(animations, 'right');
-
-              //         fbxLoader.load(
-              //           'assets/archer/left.fbx',
-              //           (object) => {
-              //             console.log("Loaded run left");
-              //             const animationAction = mixer.clipAction(object.animations[0]);
-              //             animationActions.push(animationAction);
-              //             animationsFolder.add(animations, 'left');
-
-              //             fbxLoader.load(
-              //               'assets/archer/run-forward.fbx',
-              //               (object) => {
-              //                 console.log("Loaded run forward");
-              //                 const animationAction = mixer.clipAction(object.animations[0]);
-              //                 animationActions.push(animationAction);
-              //                 animationsFolder.add(animations, 'runForward');
-
-              //                 modelReady = true
-              //                 console.warn("ALL FBX IS LOADED!", animationActions)
-              //               }
-              //             )
-              //           }
-              //         )
-              //       }
-              //     )
-              //   }
-              // )
+                      fbxLoader.load(
+                        'assets/archer/hiphopdancing.fbx',
+                        (object) => {
+                          console.log("Loaded hiphopdancing");
+                          const animationAction = mixer.clipAction(object.animations[0]);
+                          animationActions.push(animationAction);
+                          animationsFolder.add(animations, 'hiphopdancing'); // hiphopdancing
+                        }
+                      )
+                    }
+                  )
+                }
+              )
             }
           )
         }
@@ -368,22 +325,17 @@ function onKeyDown(event) {
   if (event.keyCode == 87) { // W
     keys.W = true;
     setAction(animationActions[2])
-    // setAction(animationActions[3])
-    if (event.keyCode == 16) { // D
-      keys.SHF = true;
-      setAction(animationActions[7])
-    }
-  }
-  if (event.keyCode == 65) { // A
-    keys.A = true;
-    setAction(animationActions[4])
   }
   if (event.keyCode == 83) { // S
     keys.S = true;
     setAction(animationActions[1])
   }
-  if (event.keyCode == 68) { // D
-    keys.D = true;
+  if (event.keyCode == 70) { // F
+    keys.F = true;
+    setAction(animationActions[4])
+  }
+  if (event.keyCode == 71) { // G
+    keys.F = true;
     setAction(animationActions[5])
   }
 }
@@ -393,20 +345,18 @@ function onKeyUp(event) {
     keys.W = false;
     setAction(animationActions[0])
   }
-  if (event.keyCode == 65) { // A
-    keys.A = false;
-    setAction(animationActions[0])
-  }
   if (event.keyCode == 83) { // S
     keys.S = false;
     setAction(animationActions[0])
   }
-  if (event.keyCode == 68) { // D
-    keys.D = false;
-    setAction(animationActions[0])
+  if (event.keyCode == 70) { // F
+    keys.F = false;
+    setAction(animationActions[4])
   }
-
-  // setAction(animationActions[0])
+  if (event.keyCode == 71) { // G
+    keys.F = false;
+    setAction(animationActions[5])
+  }
 }
 
 window.onload = init(), animate();
